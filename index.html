@@ -96,7 +96,7 @@ const pools=[
  ,
  // 次元界オーナメント 6 sets ×2 pieces
  [
- ["グラモス","次元界オーブ","連結縄"],["宇宙ステーション","次元界オーブ","連結縄"],["配信ルーム","次元界オーブ","連結縄"],["競技場","次元界オーブ","連結縄"],["ルサカ","次元界オーブ","連結縄"],["バナダイス","次元界オーブ","連結縄"]
+ ["グラモス","次元界オーブ","連結縄"],["宇宙ステーション","次元界オーブ","連結縄"],["配信ルーム","配信ルームの無数のウィンドウ","配信ルームの自由なチャット欄"],["競技場","次元界オーブ","連結縄"],["ルサカ","次元界オーブ","連結縄"],["バナダイス","次元界オーブ","連結縄"]
  ].flatMap((s,i)=>[["o"+i+"a","オーナメント："+s[0],s[1]+"："+s[0],"◉"],["o"+i+"b","オーナメント："+s[0],s[2]+"："+s[0],"◎"]])
 ];
 let card=[],called=new Set(),current=null,score=0,hearts=3,draws=0,finished=false,hinted=false,linesSeen=new Set();
@@ -119,7 +119,19 @@ function iconMarkup(id, className="avatar"){
  return `<img class="${className} ${category}" src="${BINGO_ICONS[category]}" alt="" draggable="false">`;
 }
 const shuffle=a=>{let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
-function makeCard(){card=[];for(let c=0;c<5;c++)shuffle(pools[c]).slice(0,5).forEach((it,r)=>card.push({...it,col:c,row:r,marked:false}));}
+function makeCard(){
+ const previous=card.map(x=>x.id).join("|");
+ let next=[];
+ for(let attempt=0;attempt<100;attempt++){
+  next=[];
+  for(let c=0;c<5;c++){
+   shuffle(pools[c]).slice(0,5).forEach((it,r)=>next.push({...it,col:c,row:r,marked:false}));
+  }
+  if(next.length===25 && next.map(x=>x.id).join("|")!==previous)break;
+ }
+ if(next.length!==25)throw new Error("ビンゴカードの生成に失敗しました");
+ card=next;
+}
 function render(){let b=$("board");b.innerHTML="";for(let r=0;r<5;r++)for(let c=0;c<5;c++){let it=card.find(x=>x.row===r&&x.col===c);let e=document.createElement("button");e.className="tile"+(it.marked?" marked":"")+(current&&it.id===current.id?" focus":"");e.disabled=finished||it.marked;e.innerHTML=`${iconMarkup(it.id)}<span class="tiny">${it.name}</span>`;e.title=it.group+" / "+it.name;e.setAttribute("aria-label",it.group+" "+it.name);e.onclick=()=>select(it);b.append(e)}$("markedCount").textContent="マーク "+card.filter(x=>x.marked).length+" / 25";$("drawCount").textContent="コール "+draws;}
 function update(){ $("score").textContent=score;$("hearts").textContent="♥".repeat(hearts)+"♡".repeat(3-hearts);let best=Number(localStorage.getItem("danBingoBest")||0);$("best").textContent=best?best:"—";$("hintBtn").disabled=!current||hinted||finished;$("skipBtn").disabled=!current||finished;$("drawBtn").disabled=finished||!!current;}
 function say(t){$("notice").textContent=t}
@@ -134,7 +146,15 @@ function nearLines(){let lines=[];for(let r=0;r<5;r++)lines.push(Array.from({len
 function skip(){if(!current)return;let has=card.some(x=>x.id===current.id);if(has){say("このコールはカードにあります。マスを探してタップ！");return}say("通過！ 次のコールへ");current=null;$("callout").innerHTML=`<div class="call-name">次のコールへ</div>`;update()}
 function hint(){if(!current||hinted)return;hinted=true;score=Math.max(0,score-50);let it=card.find(x=>x.id===current.id);if(it){say("ヒント：上から"+(it.row+1)+"段目、左から"+(it.col+1)+"列目！");}else{say("ヒント：今回のコールはカードにありません。");}update();render()}
 function end(win){if(finished)return;finished=true;current=null;update();let best=Number(localStorage.getItem("danBingoBest")||0),isNew=score>best;if(isNew){localStorage.setItem("danBingoBest",String(score));toast("NEW RECORD！");}let rank=score>=3000?"伝説の龍尊マエストロ":score>=2000?"Bravo！あなたは丹恒マエストロ！":score>=1200?"熟練の雲騎ビンゴ師":score>=600?"駆け出しの丹恒ファン":"見習い開拓者";$("finalScore").textContent=score;$("rank").textContent=rank;$("resultText").textContent=(win?"ビンゴ達成、おめでとう！":"ゲーム終了！")+(isNew?" 新記録更新！":"")+"\n正解マーク："+card.filter(x=>x.marked).length+" / 25　コール："+draws+"回";$("resultPanel").classList.add("show");render();$("resultPanel").scrollIntoView({behavior:"smooth",block:"nearest"})}
-function restart(){$("resultPanel").classList.remove("show");score=0;hearts=3;draws=0;called.clear();current=null;finished=false;hinted=false;linesSeen.clear();makeCard();$("callout").innerHTML='<div><div class="call-empty">「次のコール」を押してゲーム開始！</div><div class="call-meta">表示された名称と同じアイコンをカードから探そう</div></div>';$("notice").textContent="カードにないコールは「カードになし」で通過できます。";render();update()}
+function restart(){
+ $("resultPanel").classList.remove("show");
+ score=0;hearts=3;draws=0;called.clear();current=null;finished=false;hinted=false;linesSeen.clear();
+ makeCard();
+ $("callout").innerHTML='<div><div class="call-empty">「次のコール」を押してゲーム開始！</div><div class="call-meta">表示された名称と同じアイコンをカードから探そう</div></div>';
+ $("notice").textContent="新しいカードを作成したよ！";
+ render();update();
+ $("board").scrollIntoView({behavior:"smooth",block:"center"});
+}
 $("drawBtn").addEventListener("click",draw);$("skipBtn").addEventListener("click",skip);$("hintBtn").addEventListener("click",hint);$("restartBtn").addEventListener("click",e=>{e.preventDefault();restart()});$("againBtn").addEventListener("click",e=>{e.preventDefault();restart()});
 
 makeCard();render();update();
