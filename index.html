@@ -45,6 +45,12 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 .tile.free .avatar{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;opacity:1;transform:none;filter:none}
 .tile.focus{outline:3px solid #e5d39b;outline-offset:-3px;animation:pulse 1s infinite}
 .notice{white-space:pre-line}
+
+/* FREE icon is smaller on the board; the result screen displays the same chosen image. */
+.tile.free .avatar{width:76%!important;height:76%!important;max-width:76%!important;max-height:76%!important;object-fit:contain!important}
+.result-free-icon{display:flex;align-items:center;justify-content:center;width:104px;height:104px;margin:12px auto 4px;background:transparent;border:0}
+.result-free-icon .avatar{display:block;width:100%;height:100%;object-fit:contain}
+@media(max-width:400px){.result-free-icon{width:88px;height:88px}}
 </style>
 </head>
 <body>
@@ -90,7 +96,7 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 </section>
 </main>
 <section class="panel result-panel" id="resultPanel" aria-live="polite">
- <h2>GAME CLEAR</h2><div class="rank" id="rank">丹恒マエストロ</div><p id="resultText"></p>
+ <h2>GAME CLEAR</h2><div class="result-free-icon" id="resultFreeIcon" aria-label="このカードのFREEアイコン" aria-hidden="true"></div><div class="rank" id="rank">丹恒マエストロ</div><p id="resultText"></p>
  <a class="btn share-x" id="shareX" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Xでビンゴ結果をシェア">Xで結果をシェア</a>
  <button class="btn secondary" id="againBtn">もう一度遊ぶ</button>
 </section>
@@ -164,7 +170,7 @@ function render(){
   const tile=document.createElement("button");tile.type="button";
   tile.className="tile col-"+c+(it.marked?" marked":"")+(it.free?" free":"")+(current&&hintLevel>=3&&current.id===it.id?" focus":"");
   tile.setAttribute("aria-label",it.free?"FREEマス":it.group+" "+callName(it)+(it.marked?" 回答済み":""));
-  tile.title=it.free?"FREE":it.group+" / "+callName(it);
+  // Hover tooltips are intentionally disabled; accessible names remain in aria-label.
   tile.innerHTML=iconMarkup(it.id);
   tile.disabled=it.marked||finished;
   tile.addEventListener("click",()=>select(it));board.appendChild(tile);
@@ -279,6 +285,8 @@ function end(win){
  finished=true;current=null;
  const n=totalErrors(),best=readBest(),isNew=best===null||n<best;
  if(isNew)saveBest(n);
+ const freeTile=card.find(x=>x.free);
+ $("resultFreeIcon").innerHTML=freeTile?iconMarkup(freeTile.id):"";
  $("rank").textContent=rankFor(n);
  const shareText="丹恒ビンゴでビンゴ達成！\n称号："+rankFor(n)+"\n#丹恒ビンゴ #崩壊スターレイル";
  $("shareX").href="https://twitter.com/intent/tweet?"+new URLSearchParams({text:shareText,url:"https://shisui-akiyama.github.io/danheng-bingo/"}).toString();
@@ -290,6 +298,7 @@ function restart(){
  try{
   notice.textContent="新しいカードを作成中…";
   $("resultPanel").classList.remove("show");
+  $("resultFreeIcon").replaceChildren();
   draws=0;called.clear();current=null;finished=false;hintLevel=0;hintUses=0;wrongTaps=0;badSkips=0;absentStreak=0;linesSeen.clear();
   makeCard();
   $("callout").innerHTML='<div><div class="call-empty">「次のコール」を押してゲーム開始！</div><div class="call-meta">表示された名称と同じアイコンをカードから探そう</div></div>';
