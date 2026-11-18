@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101a2c">
 <meta name="description" content="軌跡・星魂・トンネル遺物・オーナメントのアイコンを使った、非公式ファンメイドの丹恒ビンゴゲーム。">
-<title>丹恒ビンゴ・マエストロ</title>
+<title>丹恒ビンゴ</title>
 <style>
 :root{--bg:#0d1728;--panel:#17263c;--panel2:#20334d;--ink:#edf5ff;--muted:#a9bdd4;--gold:#e8c77b;--cyan:#82d7df;--red:#ff8290;--green:#92e1bd}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#203956 0,#101b30 45%,#0a1220 100%);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;min-height:100vh}
@@ -13,8 +13,8 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#17263ce8;border:1px solid #35506b;border-radius:13px;padding:10px;text-align:center}.stat small{display:block;color:var(--muted);font-size:10px}.stat strong{font-size:19px}.hearts{color:#ff8290;letter-spacing:3px}
 .panel{background:linear-gradient(145deg,#1a2b43,#142238);border:1px solid #38536e;border-radius:17px;padding:14px;margin:12px 0;box-shadow:0 8px 25px #0003}.panel h2{font-size:14px;color:var(--gold);margin:0 0 10px;letter-spacing:.06em}
 .callout{display:flex;align-items:center;min-height:72px}.call-name{font-size:20px;font-weight:800;line-height:1.5}.call-meta{font-size:11px;color:var(--muted);margin-top:4px}.call-empty{color:var(--muted);font-size:13px}
-.actions{display:flex;gap:8px;margin-top:12px}.btn{border:0;border-radius:12px;padding:12px 10px;font-weight:750;font-size:13px;cursor:pointer;flex:1;color:#142237;background:linear-gradient(135deg,#f0d99c,#c8a95e)}.btn.secondary{background:#2b4560;color:#e8f1fb;border:1px solid #54718d}.btn.hint{background:#284c58;color:#bdf4e7;border:1px solid #4b8790}.btn:disabled{opacity:.4;cursor:not-allowed}
-.board-wrap{overflow:hidden}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.tile{position:relative;min-width:0;aspect-ratio:1/1.05;border-radius:9px;border:1px solid #526b83;background:linear-gradient(150deg,#29415b,#1b2e46);color:var(--ink);padding:4px 2px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;cursor:pointer;overflow:hidden}.tile .glyph{font-size:clamp(17px,5vw,24px);line-height:1.05;color:#f0dba5;text-shadow:0 2px 8px #0007}.tile .avatar{width:clamp(34px,9vw,48px);height:clamp(34px,9vw,48px);object-fit:contain;border-radius:10px;border:1px solid #b9c9d8;background:#101a2c;box-shadow:0 2px 8px #0008}.call-icon{overflow:hidden}.call-icon img{width:100%;height:100%;object-fit:contain;padding:3px;border-radius:15px}.tile .tiny{font-size:clamp(7px,2vw,9px);line-height:1.2;color:#dce9f5;overflow-wrap:anywhere}.tile.marked{background:linear-gradient(145deg,#285a5a,#1d474e);border:2px solid #9be7cb}.tile.marked:after{content:"✓";position:absolute;right:3px;top:0;color:#a8f2d5;font-weight:900;font-size:14px}.tile.focus{outline:3px solid var(--gold);outline-offset:-3px;animation:pulse 1s infinite}.tile:disabled{cursor:default;opacity:.9}
+.actions{display:flex;gap:8px;margin-top:12px}.btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;border:0;border-radius:12px;padding:12px 10px;font-weight:750;font-size:13px;cursor:pointer;flex:1;color:#142237;background:linear-gradient(135deg,#f0d99c,#c8a95e)}.btn.secondary{background:#2b4560;color:#e8f1fb;border:1px solid #54718d}.btn.hint{background:#284c58;color:#bdf4e7;border:1px solid #4b8790}.btn:disabled{opacity:.4;cursor:not-allowed}
+.board-wrap{overflow:hidden}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.tile{touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:relative;min-width:0;aspect-ratio:1/1.05;border-radius:9px;border:1px solid #526b83;background:linear-gradient(150deg,#29415b,#1b2e46);color:var(--ink);padding:4px 2px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;cursor:pointer;overflow:hidden}.tile .glyph{font-size:clamp(17px,5vw,24px);line-height:1.05;color:#f0dba5;text-shadow:0 2px 8px #0007}.tile .avatar{width:clamp(34px,9vw,48px);height:clamp(34px,9vw,48px);object-fit:contain;border-radius:10px;border:1px solid #b9c9d8;background:#101a2c;box-shadow:0 2px 8px #0008}.call-icon{overflow:hidden}.call-icon img{width:100%;height:100%;object-fit:contain;padding:3px;border-radius:15px}.tile .tiny{font-size:clamp(7px,2vw,9px);line-height:1.2;color:#dce9f5;overflow-wrap:anywhere}.tile.marked{background:linear-gradient(145deg,#285a5a,#1d474e);border:2px solid #9be7cb}.tile.marked:after{content:"✓";position:absolute;right:3px;top:0;color:#a8f2d5;font-weight:900;font-size:14px}.tile.focus{outline:3px solid var(--gold);outline-offset:-3px;animation:pulse 1s infinite}.tile:disabled{cursor:default;opacity:.9}
 @keyframes pulse{50%{filter:brightness(1.4)}}.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:10px}.notice{min-height:20px;text-align:center;color:var(--cyan);font-weight:700;font-size:13px;margin-top:8px}.rules{font-size:12px;color:var(--muted);line-height:1.8}.rules b{color:#e9d49c}@keyframes pop{from{transform:translateX(-50%) scale(.7)}to{transform:translateX(-50%) scale(1)}}
 @media(min-width:500px){main{padding-top:24px}.tile{border-radius:11px}.board{gap:7px}}
 .result-panel{display:none}.result-panel.show{display:block}.result-panel h2{font-family:serif;color:#f4dda0;font-size:24px;margin:0 0 8px}.result-panel .score{font-size:38px;font-weight:900;color:#fff1c5}.result-panel .rank{font-size:17px;color:#9fe6d0;font-weight:800;margin:8px}.result-panel p{color:var(--muted);font-size:13px;line-height:1.7;white-space:pre-line}
@@ -22,7 +22,7 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 </head>
 <body>
 <main>
-<header class="hero"><div class="eyebrow">HONKAI: STAR RAIL · DAN HENG COLLECTION</div><h1>丹恒ビンゴ・マエストロ</h1><p>軌跡・星魂・遺物・オーナメントのアイコンで楽しむビンゴ。</p></header>
+<header class="hero"><div class="eyebrow">HONKAI: STAR RAIL · DAN HENG COLLECTION</div><h1>丹恒ビンゴ</h1><p>軌跡・星魂・遺物・オーナメントのアイコンで楽しむビンゴ。</p></header>
 <section class="stats">
  <div class="stat"><small>スコア</small><strong id="score">0</strong></div>
  <div class="stat"><small>ハート</small><strong class="hearts" id="hearts">♥♥♥</strong></div>
@@ -96,7 +96,7 @@ const pools=[
  ,
  // 次元界オーナメント 6 sets ×2 pieces
  [
- ["グラモス","次元界オーブ","連結縄"],["宇宙ステーション","次元界オーブ","連結縄"],["配信ルーム","配信ルームの無数のウィンドウ","配信ルームの自由なチャット欄"],["競技場","次元界オーブ","連結縄"],["ルサカ","次元界オーブ","連結縄"],["バナダイス","次元界オーブ","連結縄"]
+ ["グラモス","次元界オーブ","連結縄"],["宇宙ステーション","次元界オーブ","連結縄"],["配信ルーム","次元界オーブ","連結縄"],["競技場","次元界オーブ","連結縄"],["ルサカ","次元界オーブ","連結縄"],["バナダイス","次元界オーブ","連結縄"]
  ].flatMap((s,i)=>[["o"+i+"a","オーナメント："+s[0],s[1]+"："+s[0],"◉"],["o"+i+"b","オーナメント："+s[0],s[2]+"："+s[0],"◎"]])
 ];
 let card=[],called=new Set(),current=null,score=0,hearts=3,draws=0,finished=false,hinted=false,linesSeen=new Set();
@@ -119,19 +119,7 @@ function iconMarkup(id, className="avatar"){
  return `<img class="${className} ${category}" src="${BINGO_ICONS[category]}" alt="" draggable="false">`;
 }
 const shuffle=a=>{let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
-function makeCard(){
- const previous=card.map(x=>x.id).join("|");
- let next=[];
- for(let attempt=0;attempt<100;attempt++){
-  next=[];
-  for(let c=0;c<5;c++){
-   shuffle(pools[c]).slice(0,5).forEach((it,r)=>next.push({...it,col:c,row:r,marked:false}));
-  }
-  if(next.length===25 && next.map(x=>x.id).join("|")!==previous)break;
- }
- if(next.length!==25)throw new Error("ビンゴカードの生成に失敗しました");
- card=next;
-}
+function makeCard(){card=[];for(let c=0;c<5;c++)shuffle(pools[c]).slice(0,5).forEach((it,r)=>card.push({...it,col:c,row:r,marked:false}));}
 function render(){let b=$("board");b.innerHTML="";for(let r=0;r<5;r++)for(let c=0;c<5;c++){let it=card.find(x=>x.row===r&&x.col===c);let e=document.createElement("button");e.className="tile"+(it.marked?" marked":"")+(current&&it.id===current.id?" focus":"");e.disabled=finished||it.marked;e.innerHTML=`${iconMarkup(it.id)}<span class="tiny">${it.name}</span>`;e.title=it.group+" / "+it.name;e.setAttribute("aria-label",it.group+" "+it.name);e.onclick=()=>select(it);b.append(e)}$("markedCount").textContent="マーク "+card.filter(x=>x.marked).length+" / 25";$("drawCount").textContent="コール "+draws;}
 function update(){ $("score").textContent=score;$("hearts").textContent="♥".repeat(hearts)+"♡".repeat(3-hearts);let best=Number(localStorage.getItem("danBingoBest")||0);$("best").textContent=best?best:"—";$("hintBtn").disabled=!current||hinted||finished;$("skipBtn").disabled=!current||finished;$("drawBtn").disabled=finished||!!current;}
 function say(t){$("notice").textContent=t}
@@ -147,15 +135,27 @@ function skip(){if(!current)return;let has=card.some(x=>x.id===current.id);if(ha
 function hint(){if(!current||hinted)return;hinted=true;score=Math.max(0,score-50);let it=card.find(x=>x.id===current.id);if(it){say("ヒント：上から"+(it.row+1)+"段目、左から"+(it.col+1)+"列目！");}else{say("ヒント：今回のコールはカードにありません。");}update();render()}
 function end(win){if(finished)return;finished=true;current=null;update();let best=Number(localStorage.getItem("danBingoBest")||0),isNew=score>best;if(isNew){localStorage.setItem("danBingoBest",String(score));toast("NEW RECORD！");}let rank=score>=3000?"伝説の龍尊マエストロ":score>=2000?"Bravo！あなたは丹恒マエストロ！":score>=1200?"熟練の雲騎ビンゴ師":score>=600?"駆け出しの丹恒ファン":"見習い開拓者";$("finalScore").textContent=score;$("rank").textContent=rank;$("resultText").textContent=(win?"ビンゴ達成、おめでとう！":"ゲーム終了！")+(isNew?" 新記録更新！":"")+"\n正解マーク："+card.filter(x=>x.marked).length+" / 25　コール："+draws+"回";$("resultPanel").classList.add("show");render();$("resultPanel").scrollIntoView({behavior:"smooth",block:"nearest"})}
 function restart(){
- $("resultPanel").classList.remove("show");
- score=0;hearts=3;draws=0;called.clear();current=null;finished=false;hinted=false;linesSeen.clear();
- makeCard();
- $("callout").innerHTML='<div><div class="call-empty">「次のコール」を押してゲーム開始！</div><div class="call-meta">表示された名称と同じアイコンをカードから探そう</div></div>';
- $("notice").textContent="新しいカードを作成したよ！";
- render();update();
- $("board").scrollIntoView({behavior:"smooth",block:"center"});
+ const notice=$("notice");
+ notice.textContent="再スタート処理中…";
+ try{
+  $("resultPanel").classList.remove("show");
+  score=0;hearts=3;draws=0;called.clear();current=null;finished=false;hinted=false;linesSeen.clear();
+  makeCard();
+  $("callout").innerHTML='<div><div class="call-empty">「次のコール」を押してゲーム開始！</div><div class="call-meta">表示された名称と同じアイコンをカードから探そう</div></div>';
+  render();update();
+  notice.textContent="新しいカードを作成したよ！";
+  try{$("board").scrollIntoView({behavior:"smooth",block:"center"});}catch(scrollError){}
+ }catch(error){
+  notice.textContent="再スタートに失敗しました。ページを再読み込みしてください。";
+  console.error("restart error:",error);
+ }
 }
-$("drawBtn").addEventListener("click",draw);$("skipBtn").addEventListener("click",skip);$("hintBtn").addEventListener("click",hint);$("restartBtn").addEventListener("click",e=>{e.preventDefault();restart()});$("againBtn").addEventListener("click",e=>{e.preventDefault();restart()});
+function bindTap(id,handler){
+ const button=$(id);
+ if(!button)return;
+ button.addEventListener("click",event=>{event.preventDefault();handler();});
+}
+bindTap("drawBtn",draw);bindTap("skipBtn",skip);bindTap("hintBtn",hint);bindTap("restartBtn",restart);bindTap("againBtn",restart);
 
 makeCard();render();update();
 </script>
