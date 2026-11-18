@@ -17,8 +17,9 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 .board-wrap{overflow:hidden}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.tile{touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:relative;min-width:0;aspect-ratio:1/1.12;border-radius:50% 50% 0 0 / 27% 27% 0 0;border:1px solid var(--col-border,#6b9387);background:linear-gradient(155deg,var(--col-top,#34635b),var(--col-bottom,#1c3936));color:var(--ink);padding:8px 3px 4px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;overflow:hidden}.tile .glyph{font-size:clamp(17px,5vw,24px);line-height:1.05;color:#f0dba5;text-shadow:0 2px 8px #0007}.tile .avatar{width:82%;height:78%;object-fit:contain;border:0;border-radius:0;background:transparent;box-shadow:none}.call-icon{overflow:hidden}.call-icon img{width:100%;height:100%;object-fit:contain;padding:3px;border-radius:15px}.tile .tiny{font-size:clamp(7px,2vw,9px);line-height:1.2;color:#dce9f5;overflow-wrap:anywhere}.tile.marked{background:linear-gradient(145deg,#346f62,#1c4d43);border:2px solid #b9e8ce}.tile.marked:after{content:"✓";position:absolute;right:3px;top:0;color:#a8f2d5;font-weight:900;font-size:14px}.tile.focus{outline:3px solid var(--gold);outline-offset:-3px;animation:pulse 1s infinite}.tile:disabled{cursor:default;opacity:.9}
 @keyframes pulse{50%{filter:brightness(1.4)}}.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:10px}.notice{min-height:20px;text-align:center;color:var(--cyan);font-weight:700;font-size:13px;margin-top:8px}.rules{font-size:12px;color:var(--muted);line-height:1.8}.rules b{color:#e9d49c}@keyframes pop{from{transform:translateX(-50%) scale(.7)}to{transform:translateX(-50%) scale(1)}}
 @media(min-width:500px){main{padding-top:24px}.board{gap:7px}}
-.result-panel{display:none}.result-panel.show{display:block}.result-panel h2{font-family:serif;color:#f4dda0;font-size:24px;margin:0 0 8px}.result-panel .score{font-size:38px;font-weight:900;color:#fff1c5}.result-panel .rank{font-size:17px;color:#9fe6d0;font-weight:800;margin:8px}.result-panel p{color:var(--muted);font-size:13px;line-height:1.7;white-space:pre-line}
+.result-panel{display:none}.result-panel.show{display:block}.result-panel h2{font-family:serif;color:#f4dda0;font-size:24px;margin:0 0 8px}.result-panel .score{font-size:38px;font-weight:900;color:#fff1c5}.result-panel .rank{font-size:clamp(26px,6.5vw,38px);line-height:1.4;overflow-wrap:anywhere;text-align:center;color:#c3f2dd;font-weight:900;margin:18px 0 14px;text-shadow:0 2px 15px #78cdbb44}.result-panel p{color:var(--muted);font-size:13px;line-height:1.7;white-space:pre-line}
 
+.share-x{display:block;text-align:center;text-decoration:none;margin:12px 0 14px;background:#213a3b;color:#f4f8f6;border:1px solid #729b8e}.share-x:hover{background:#315653}
 /* 翡翠の五段階グラデーション。列は画像の色に頼らず識別できる。 */
 .col-0{--col-top:#295c50;--col-bottom:#153c36;--col-border:#548e78}
 .col-1{--col-top:#2b6865;--col-bottom:#164743;--col-border:#61a19a}
@@ -89,7 +90,8 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 </section>
 </main>
 <section class="panel result-panel" id="resultPanel" aria-live="polite">
- <h2>GAME CLEAR</h2><div class="score" id="finalScore">0</div><div>カウント</div><div class="rank" id="rank">丹恒マエストロ</div><p id="resultText"></p>
+ <h2>GAME CLEAR</h2><div class="rank" id="rank">丹恒マエストロ</div><p id="resultText"></p>
+ <a class="btn share-x" id="shareX" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Xでビンゴ結果をシェア">Xで結果をシェア</a>
  <button class="btn secondary" id="againBtn">もう一度遊ぶ</button>
 </section>
 <script>
@@ -277,8 +279,9 @@ function end(win){
  finished=true;current=null;
  const n=totalErrors(),best=readBest(),isNew=best===null||n<best;
  if(isNew)saveBest(n);
- $("finalScore").textContent=n;
  $("rank").textContent=rankFor(n);
+ const shareText="丹恒ビンゴでビンゴ達成！\n称号："+rankFor(n)+"\n#丹恒ビンゴ #崩壊スターレイル";
+ $("shareX").href="https://twitter.com/intent/tweet?"+new URLSearchParams({text:shareText,url:"https://shisui-akiyama.github.io/danheng-bingo/"}).toString();
  $("resultText").textContent=(win?"ビンゴ達成！":"ゲーム終了！")+(isNew?" ベスト記録更新！":"")+"\nヒント使用："+hintUses+"回　誤タップ："+wrongTaps+"回　誤通過："+badSkips+"回\nコール："+draws+"回";
  $("resultPanel").classList.add("show");render();update();$("resultPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
