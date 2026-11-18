@@ -121,17 +121,30 @@ function iconMarkup(id, className="avatar"){
 const shuffle=a=>{let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
 function makeCard(){
  const previous=card.map(x=>x.id).join("|");
+ if(pools.length!==5||pools.some(pool=>!Array.isArray(pool)||pool.length<5)){
+  throw new Error("ビンゴの素材データが不足しています");
+ }
  let next=[];
  for(let attempt=0;attempt<100;attempt++){
   next=[];
-  for(let c=0;c<5;c++)shuffle(pools[c]).slice(0,5).forEach((it,r)=>next.push({...it,col:c,row:r,marked:false}));
+  for(let c=0;c<5;c++)shuffle(pools[c]).slice(0,5).forEach((it,r)=>next.push({id:it[0],group:it[1],name:it[2],glyph:it[3],col:c,row:r,marked:false}));
   if(next.length===25&&next.map(x=>x.id).join("|")!==previous)break;
  }
- if(next.length!==25)throw new Error("カードを作成できませんでした");
+ if(next.length!==25||next.some(x=>!x.id||!x.group||!x.name||typeof x.col!=="number"||typeof x.row!=="number")){
+  throw new Error("カードのデータを正しく作成できませんでした");
+ }
  card=next;
 }
 function render(){let b=$("board");b.innerHTML="";for(let r=0;r<5;r++)for(let c=0;c<5;c++){let it=card.find(x=>x.row===r&&x.col===c);let e=document.createElement("button");e.className="tile"+(it.marked?" marked":"")+(current&&it.id===current.id?" focus":"");e.disabled=finished||it.marked;e.innerHTML=`${iconMarkup(it.id)}<span class="tiny">${it.name}</span>`;e.title=it.group+" / "+it.name;e.setAttribute("aria-label",it.group+" "+it.name);e.onclick=()=>select(it);b.append(e)}$("markedCount").textContent="マーク "+card.filter(x=>x.marked).length+" / 25";$("drawCount").textContent="コール "+draws;}
-function update(){ $("score").textContent=score;$("hearts").textContent="♥".repeat(hearts)+"♡".repeat(3-hearts);let best=Number(localStorage.getItem("danBingoBest")||0);$("best").textContent=best?best:"—";$("hintBtn").disabled=!current||hinted||finished;$("skipBtn").disabled=!current||finished;$("drawBtn").disabled=finished||!!current;}
+function readBest(){
+ try{return Number(window.localStorage.getItem("danBingoBest")||0)||0;}
+ catch(error){console.warn("localStorage unavailable:",error);return 0;}
+}
+function saveBest(value){
+ try{window.localStorage.setItem("danBingoBest",String(value));return true;}
+ catch(error){console.warn("localStorage unavailable:",error);return false;}
+}
+function update(){ $("score").textContent=score;$("hearts").textContent="♥".repeat(hearts)+"♡".repeat(3-hearts);let best=readBest();$("best").textContent=best?best:"—";$("hintBtn").disabled=!current||hinted||finished;$("skipBtn").disabled=!current||finished;$("drawBtn").disabled=finished||!!current;}
 function say(t){$("notice").textContent=t}
 function toast(t){say(t)}
 function draw(){if(finished||current)return;let available=pools.flat().filter(x=>!called.has(x[0]));if(!available.length){end(false);return}let x=shuffle(available)[0];called.add(x[0]);draws++;current={id:x[0],group:x[1],name:x[2],glyph:x[3]};hinted=false;$("callout").innerHTML=`<div class="call-name">${current.name}</div>`;say("カードに同じアイコンがあればタップ！");render();update();let idx=card.findIndex(i=>i.id===current.id);if(idx<0){say("このコールはカードにありません。通過して次へ！");}}
@@ -143,7 +156,7 @@ function checkLines(){let lines=[];for(let r=0;r<5;r++)lines.push(Array.from({le
 function nearLines(){let lines=[];for(let r=0;r<5;r++)lines.push(Array.from({length:5},(_,c)=>card.find(x=>x.row===r&&x.col===c)));for(let c=0;c<5;c++)lines.push(Array.from({length:5},(_,r)=>card.find(x=>x.row===r&&x.col===c)));lines.push(Array.from({length:5},(_,i)=>card.find(x=>x.row===i&&x.col===i)));lines.push(Array.from({length:5},(_,i)=>card.find(x=>x.row===i&&x.col===4-i)));return lines.filter(l=>l.filter(x=>x.marked).length===4)}
 function skip(){if(!current)return;let has=card.some(x=>x.id===current.id);if(has){say("このコールはカードにあります。マスを探してタップ！");return}say("通過！ 次のコールへ");current=null;$("callout").innerHTML=`<div class="call-name">次のコールへ</div>`;update()}
 function hint(){if(!current||hinted)return;hinted=true;score=Math.max(0,score-50);let it=card.find(x=>x.id===current.id);if(it){say("ヒント：上から"+(it.row+1)+"段目、左から"+(it.col+1)+"列目！");}else{say("ヒント：今回のコールはカードにありません。");}update();render()}
-function end(win){if(finished)return;finished=true;current=null;update();let best=Number(localStorage.getItem("danBingoBest")||0),isNew=score>best;if(isNew){localStorage.setItem("danBingoBest",String(score));toast("NEW RECORD！");}let rank=score>=3000?"伝説の龍尊マエストロ":score>=2000?"Bravo！あなたは丹恒マエストロ！":score>=1200?"熟練の雲騎ビンゴ師":score>=600?"駆け出しの丹恒ファン":"見習い開拓者";$("finalScore").textContent=score;$("rank").textContent=rank;$("resultText").textContent=(win?"ビンゴ達成、おめでとう！":"ゲーム終了！")+(isNew?" 新記録更新！":"")+"\n正解マーク："+card.filter(x=>x.marked).length+" / 25　コール："+draws+"回";$("resultPanel").classList.add("show");render();$("resultPanel").scrollIntoView({behavior:"smooth",block:"nearest"})}
+function end(win){if(finished)return;finished=true;current=null;update();let best=readBest(),isNew=score>best;if(isNew){saveBest(score);toast("NEW RECORD！");}let rank=score>=3000?"伝説の龍尊マエストロ":score>=2000?"Bravo！あなたは丹恒マエストロ！":score>=1200?"熟練の雲騎ビンゴ師":score>=600?"駆け出しの丹恒ファン":"見習い開拓者";$("finalScore").textContent=score;$("rank").textContent=rank;$("resultText").textContent=(win?"ビンゴ達成、おめでとう！":"ゲーム終了！")+(isNew?" 新記録更新！":"")+"\n正解マーク："+card.filter(x=>x.marked).length+" / 25　コール："+draws+"回";$("resultPanel").classList.add("show");render();$("resultPanel").scrollIntoView({behavior:"smooth",block:"nearest"})}
 function restart(){
  const notice=$("notice");
  try{
@@ -155,7 +168,7 @@ function restart(){
   render();update();
   notice.textContent="新しいカードを作成したよ！";
  }catch(error){
-  notice.textContent="カード作成に失敗しました。ページを再読み込みしてください。";
+  notice.textContent="処理中にエラーが発生しました。ページを再読み込みしてください。";
   console.error("restart error:",error);
  }
 }
