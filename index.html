@@ -187,23 +187,19 @@ function cleanCallName(name){return String(name).replace(/（(?:通常攻撃|天
 const GROUP_INFO={
  "学者":{version:"Ver2.6",effect:"戦闘スキルと必殺技の与ダメージ+20%。必殺技を発動した後、次に発動する戦闘スキルの与ダメージがさらに+25%。"},
  "鷹":{version:"Ver1.0",effect:"風属性ダメージ+10%。装備キャラが必殺技を発動した後、行動順が25%早まる。"},
- "禁断の果実を貪る異端者":{version:"確認中",effect:""},
+ "禁断の果実を貪る異端者":{version:"Ver4.6",effect:""},
  "灰燼を燃やし尽くす大公":{version:"Ver1.5",effect:"装備キャラが追加攻撃を行った時、追加攻撃のヒット数に応じて攻撃力がアップする。"},
  "死水に潜る先駆者":{version:"Ver2.0",effect:"会心率+4%。デバフを2/3つ以上付与されている敵に対する、装備キャラの会心ダメージ+8%/12%。装備キャラが敵にデバフを付与した後、上記の効果が2倍になる、1ターン継続。"},
- "隠者":{version:"",effect:""},
+ "隠者":{version:"Ver3.6",effect:""},
  "蒼穹戦線グラモス":{version:"Ver1.5",effect:"装備キャラの攻撃力+12%。速度が135/160以上の時、与ダメージ+12%/18%。"},
  "宇宙封印ステーション":{version:"Ver1.0",effect:"装備キャラの攻撃力+12%。速度が120以上の場合、攻撃力がさらに+12%。"},
- "天国＠配信ルーム":{version:"",effect:""},
+ "天国＠配信ルーム":{version:"Ver3.7",effect:""},
  "星々の競技場":{version:"Ver1.2",effect:"装備キャラの会心率+8%。装備キャラの会心率が70%以上の時、通常攻撃と戦闘スキルの与ダメージ+20%。"},
  "海に沈んだルサカ":{version:"Ver2.5",effect:"装備キャラのEP回復効率+5%。装備キャラがパーティの1枠目でない場合、1枠目のキャラの攻撃力+12%。"},
- "奇想天外のバナダイス":{version:"Ver3.0",effect:"装備キャラの会心ダメージ+16%。装備キャラが召喚した対象がフィールド上にいる時、会心ダメージがさらに+32%。"}
+ "奇想天外のバナダイス":{version:"Ver2.5",effect:"装備キャラの会心ダメージ+16%。装備キャラが召喚した対象がフィールド上にいる時、会心ダメージがさらに+32%。"}
 };
 // 装備ごとの固有名。確認できない名称は仮の名称を断定せず、セットと部位を表示する。
-const EQUIPMENT_NAMES={
- "o3a":"タイキヤンのレーザー球場","o3b":"タイキヤンのアークトラック",
- "o1a":"ヘルタの宇宙ステーション","o1b":"ヘルタの軌跡",
- "o0a":"グラモスの鉄騎兵団","o0b":"グラモスの静寂の墓碑"
-};
+const EQUIPMENT_NAMES={"r00":"学者の銀縁モノクル","r01":"学者のナックルサポーター","r02":"学者のツイードジャケット","r03":"学者のスエードスノーブーツ","r10":"空飛ぶ鷹の長嘴ヘルメット","r11":"空飛ぶ鷹の双翼指輪","r12":"空飛ぶ鷹の翼装ベルト","r13":"空飛ぶ鷹の羽毛バンド","r20":"異端者の頭蓋装置","r21":"異端者の注射用手袋","r22":"異端者の理性拘束衣","r23":"異端者の飢える短靴","r30":"大公の冥焔の冠","r31":"大公の炎の手袋","r32":"大公の恩恵のロングジャケット","r33":"大公の優雅なブーツ","r40":"先駆者の断熱ヘルメット","r41":"先駆者の虚極コンパス","r42":"先駆者の密閉された鉛の潜水服","r43":"先駆者の星に泊まるアンカー","r50":"隠者のつば広帽子","r51":"隠者のシンプルな腕時計","r52":"隠者の駱駝色ジャケット","r53":"隠者の鹿革ブーツ","o0a":"グラモスの鉄騎兵団","o0b":"グラモスの静寂の墓碑","o1a":"「ヘルタ」の宇宙ステーション","o1b":"「ヘルタ」の軌跡","o2a":"配信ルームの無数のウィンドウ","o2b":"配信ルームの自由なチャット欄","o3a":"タイキヤンのレーザー球場","o3b":"タイキヤンのアークトラック","o4a":"ルサカの水に朽ちた蒼都","o4b":"ルサカの双生航路","o5a":"バナダイスの中央広場","o5b":"バナダイスのミームケーブル"};
 function callName(x){return EQUIPMENT_NAMES[x.id]||cleanCallName(x.name)}
 function charName(group){return group==="飲月"?"丹恒・飲月":group==="騰荒"?"丹恒・騰荒":"丹恒"}
 function skillKind(x){
@@ -242,23 +238,32 @@ function skip(){
  if(has)badSkips++;
  say(has?"通過しました。":"通過しました。");advance();
 }
+function equipmentPart(x){
+ if(x.col===3)return ["頭部","手部","胴体","脚部"][Number(x.id.slice(-1))]||"部位不明";
+ if(x.col===4)return x.id.endsWith("a")?"次元界オーブ":"連結縄";
+ return "";
+}
 function hint(){
  if(!current||finished||hintLevel>=3)return;
  hintLevel++;hintUses++;
- const x=current,has=card.some(it=>it.id===x.id);
+ const x=current,has=card.some(it=>it.id===x.id&&!it.marked);
+ if(!has){
+  say("このコールはカードにありません。通過して次へ！");
+  render();update();return;
+ }
  let info="";
  if(x.col<=2){
   info=charName(x.group);
   if(hintLevel>=2)info+="／"+skillKind(x);
  }else{
   const data=GROUP_INFO[x.group]||{};
-  info=data.version||"実装時期：確認中";
-  if(hintLevel>=2)info+="\n"+(data.effect||"セット効果：確認中");
+  info=(data.version||"実装時期：確認中")+(data.version?"実装":"");
+  if(hintLevel>=2)info+="\n"+equipmentPart(x);
  }
- if(!has)info+="\nこのコールはカードにありません。通過して次へ！";
- if(hintLevel===3)info+="\n"+(has?"正解マスをハイライトしました。":"カードに該当マスはありません。");
+ if(hintLevel===3)info+="\n正解マスをハイライトしました。";
  say(info);render();update();
 }
+
 function rankFor(n){
  if(n>=10)return "星穹列車の客人";
  if(n>=7)return "見習い開拓者";
