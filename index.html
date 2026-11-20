@@ -110,6 +110,7 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
 <section class="panel result-panel" id="resultPanel" aria-live="polite">
  <h2>GAME CLEAR</h2><div class="result-free-icon" id="resultFreeIcon" aria-label="このカードのFREEアイコン" aria-hidden="true"></div><div class="rank" id="rank">丹恒マエストロ</div><p id="resultText"></p>
  <a class="btn share-x" id="shareX" href="https://twitter.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Xでビンゴ結果をシェア">Xで結果をシェア</a>
+ <button class="btn secondary" id="saveResultBtn" type="button">称号画像を保存（PNG）</button>
  <button class="btn secondary" id="againBtn">もう一度遊ぶ</button>
 </section>
 <script>
@@ -305,6 +306,57 @@ function end(win){
  $("resultText").textContent=(win?"ビンゴ達成！":"ゲーム終了！")+(isNew?" ベスト記録更新！":"")+"\nヒント使用："+hintUses+"回　誤タップ："+wrongTaps+"回　誤通過："+badSkips+"回\nコール："+draws+"回";
  $("resultPanel").classList.add("show");render();update();$("resultPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
+// The export is drawn from the exact FREE image used by the current card.
+async function saveResultImage(){
+ const btn=$("saveResultBtn");
+ if(!finished)return;
+ const freeTile=card.find(item=>item.free);
+ if(!freeTile || !ITEM_IMAGES[freeTile.id])return;
+ btn.disabled=true;
+ const original=btn.textContent;
+ btn.textContent="画像を作成中…";
+ try{
+  const img=new Image();
+  img.src=ITEM_IMAGES[freeTile.id];
+  await new Promise((resolve,reject)=>{if(img.complete && img.naturalWidth){resolve();return;}img.onload=resolve;img.onerror=reject;});
+  const canvas=document.createElement("canvas");
+  canvas.width=1200;canvas.height=630;
+  const ctx=canvas.getContext("2d");
+  const w=canvas.width,h=canvas.height;
+  const bg=ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,"#071f25");bg.addColorStop(.55,"#10453e");bg.addColorStop(1,"#092b32");
+  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle="#d7ba79";ctx.lineWidth=3;ctx.strokeRect(26,26,w-52,h-52);
+  ctx.strokeStyle="rgba(215,186,121,.45)";ctx.lineWidth=1;ctx.strokeRect(36,36,w-72,h-72);
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillStyle="#f2dcab";ctx.font='bold 34px "Noto Serif JP", "Hiragino Mincho ProN", serif';
+  ctx.fillText("丹恒ビンゴ",w/2,88);
+  ctx.strokeStyle="rgba(215,186,121,.6)";ctx.beginPath();ctx.moveTo(300,128);ctx.lineTo(900,128);ctx.stroke();
+  const iconSize=205;
+  const scale=Math.min(iconSize/img.naturalWidth,iconSize/img.naturalHeight);
+  const iw=img.naturalWidth*scale,ih=img.naturalHeight*scale;
+  ctx.drawImage(img,(w-iw)/2,150+(iconSize-ih)/2,iw,ih);
+  ctx.fillStyle="#b9dfd1";ctx.font='24px "Noto Sans JP", sans-serif';
+  ctx.fillText("獲得称号",w/2,395);
+  const rank=$("rank").textContent;
+  let fontSize=rank.length>24?42:rank.length>14?52:68;
+  const maxWidth=w-110;
+  do{ctx.font=`bold ${fontSize}px "Noto Serif JP", "Hiragino Mincho ProN", serif`;if(ctx.measureText(rank).width<=maxWidth)break;fontSize-=2;}while(fontSize>26);
+  ctx.shadowColor="rgba(0,0,0,.55)";ctx.shadowBlur=14;ctx.fillStyle="#fff0c9";
+  ctx.fillText(rank,w/2,474,maxWidth);ctx.shadowBlur=0;
+  ctx.fillStyle="#b3d6cb";ctx.font='22px "Noto Sans JP", sans-serif';
+  ctx.fillText("どれくらい知ってる？　丹恒のこと",w/2,557);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+  if(!blob)throw new Error("PNGの作成に失敗しました");
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="丹恒ビンゴ_称号.png";
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  btn.textContent="称号画像を保存（PNG）";
+ }catch(err){console.error("result image export",err);btn.textContent="保存できませんでした。もう一度お試しください";}
+ finally{btn.disabled=false;setTimeout(()=>{btn.textContent=original},2500);}
+}
+
 function restart(){
  const notice=$("notice");
  try{
@@ -327,7 +379,7 @@ function bindTap(id,handler){
  if(!button)return;
  button.addEventListener("click",event=>{event.preventDefault();handler();});
 }
-bindTap("drawBtn",draw);bindTap("skipBtn",skip);bindTap("hintBtn",hint);bindTap("againBtn",restart);
+bindTap("drawBtn",draw);bindTap("skipBtn",skip);bindTap("hintBtn",hint);bindTap("againBtn",restart);bindTap("saveResultBtn",saveResultImage);
 
 makeCard();render();update();
 </script>
