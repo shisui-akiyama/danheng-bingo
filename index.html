@@ -79,7 +79,7 @@ main{width:min(100%,560px);margin:auto;padding:18px 14px 40px}.hero{text-align:c
  <div class="callout" id="callout"><div><div class="call-empty">「次のコール」を押してゲーム開始！</div><div class="call-meta">表示された名称と同じアイコンをカードから探そう</div></div></div>
  <div class="actions">
   <button class="btn" id="drawBtn" type="button">次のコール</button>
-  <button class="btn hint" id="hintBtn" disabled>ヒント①</button>
+  <button class="btn hint" id="hintBtn" disabled>ヒントを見る</button>
  </div>
  <div class="notice" id="notice" aria-live="polite">ヒントを使うと情報が表示されます。</div>
  <button class="btn secondary" id="skipBtn" style="width:100%;margin-top:8px" disabled>カードになし（通過）</button>
@@ -183,7 +183,7 @@ function render(){
  for(let r=0;r<5;r++)for(let c=0;c<5;c++){
   const it=card.find(x=>x.row===r&&x.col===c);
   const tile=document.createElement("button");tile.type="button";
-  tile.className="tile col-"+c+(it.marked?" marked":"")+(it.free?" free":"")+(current&&hintLevel>=3&&current.id===it.id?" focus":"");
+  tile.className="tile col-"+c+(it.marked?" marked":"")+(it.free?" free":"")+(current&&hintLevel>=2&&current.id===it.id?" focus":"");
   tile.setAttribute("aria-label",it.free?"FREEマス":it.group+" "+callName(it)+(it.marked?" 回答済み":""));
   // Hover tooltips are intentionally disabled; accessible names remain in aria-label.
   tile.innerHTML=iconMarkup(it.id);
@@ -200,8 +200,8 @@ function update(){
  $("score").textContent=totalErrors();
  $("callsStat").textContent=draws;
  const best=readBest();$("best").textContent=best===null?"—":best;
- $("hintBtn").textContent="ヒント"+["①","②","③"][Math.min(hintLevel,2)];
- $("hintBtn").disabled=!current||hintLevel>=3||finished;
+ $("hintBtn").textContent=hintLevel===0?"ヒントを見る":"答えをハイライト";
+ $("hintBtn").disabled=!current||hintLevel>=2||finished;
  $("skipBtn").disabled=!current||finished;
  $("drawBtn").disabled=finished||!!current;
 }
@@ -268,24 +268,29 @@ function equipmentPart(x){
  return "";
 }
 function hint(){
- if(!current||finished||hintLevel>=3)return;
- hintLevel++;hintUses++;
+ if(!current||finished||hintLevel>=2)return;
  const x=current,has=card.some(it=>it.id===x.id&&!it.marked);
  if(!has){
+  // A call absent from the card cannot reveal a hint or a highlight.
+  hintLevel=2;
   say("このコールはカードにありません。通過して次へ！");
   render();update();return;
  }
- let info="";
- if(x.col<=2){
-  info=charName(x.group);
-  if(hintLevel>=2)info+="／"+skillKind(x);
+ hintLevel++;hintUses++;
+ if(hintLevel===1){
+  let info="";
+  if(x.col<=2){
+   let kind=skillKind(x);
+   if(kind==="星魂")kind+=""+x.id.slice(2);
+   info=charName(x.group)+"／"+kind;
+  }else{
+   info=x.group+"／"+equipmentPart(x);
+  }
+  say(info);
  }else{
-  const data=GROUP_INFO[x.group]||{};
-  info=(data.version||"実装時期：確認中")+(data.version?"実装":"");
-  if(hintLevel>=2)info+="\n"+equipmentPart(x);
+  say($("notice").textContent+"\n正解マスをハイライトしました。");
  }
- if(hintLevel===3)info+="\n正解マスをハイライトしました。";
- say(info);render();update();
+ render();update();
 }
 
 function rankFor(n){
